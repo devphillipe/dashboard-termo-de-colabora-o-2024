@@ -46,8 +46,8 @@ fig1.update_layout(
         ticksuffix=" ",
         tickformat=".2s",
         title_font=dict(size=14)
+        )
 )
-
 st.plotly_chart(fig1, use_container_width=True)
 
 # Gráfico 2: Comparação Total do Contrato vs Total Pago (valores centralizados)
