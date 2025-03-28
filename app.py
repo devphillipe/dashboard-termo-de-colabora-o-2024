@@ -41,7 +41,7 @@ fig1.update_traces(
 
 fig1.update_layout(
     yaxis=dict(
-        range=[1900000, 2070000],
+        range=[1900000, 2200000],
         tickprefix="R$ ",
         ticksuffix=" ",
         tickformat=".2s",
