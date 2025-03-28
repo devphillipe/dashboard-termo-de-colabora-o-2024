@@ -2,6 +2,9 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
+# Configuração da página
+st.set_page_config(page_title="Dashboard de Economia", layout="wide")
+
 # Criando o DataFrame com os dados
 data = {
     "Mês": ["FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO", "TOTAL"],
@@ -12,20 +15,18 @@ data = {
 
 df = pd.DataFrame(data)
 
-# Formatar valores em R$
-df["Valor Contrato"] = df["Valor Contrato"].apply(lambda x: f"R$ {x:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-df["Valor Pago"] = df["Valor Pago"].apply(lambda x: f"R$ {x:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-df["Economia"] = df["Economia"].apply(lambda x: f"R$ {x:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
-
-# Configuração da página
-st.set_page_config(page_title="Dashboard de Economia", layout="wide")
+# Criar colunas formatadas para exibição
+df_display = df.copy()
+df_display["Valor Contrato"] = df["Valor Contrato"].apply(lambda x: f"R$ {x:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+df_display["Valor Pago"] = df["Valor Pago"].apply(lambda x: f"R$ {x:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+df_display["Economia"] = df["Economia"].apply(lambda x: f"R$ {x:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
 
 # Título principal
 st.title("📊 Dashboard - Economia no Termo de Colaboração 2024")
 
 # Gráfico 1: Comparação Valor Contrato vs Valor Pago por mês
 fig1 = px.bar(
-    data, x="Mês", y=["Valor Contrato", "Valor Pago"],
+    df, x="Mês", y=["Valor Contrato", "Valor Pago"],
     title="Comparação Mensal: Valor do Contrato vs Valor Pago",
     labels={"value": "Valor (R$)", "Mês": "Mês"},
     barmode="group",
@@ -34,19 +35,19 @@ fig1 = px.bar(
 st.plotly_chart(fig1, use_container_width=True)
 
 # Gráfico 2: Comparação Total do Contrato vs Total Pago
+df_total = df[df["Mês"] == "TOTAL"].melt(id_vars=["Mês"], value_vars=["Valor Contrato", "Valor Pago"])
+
 fig2 = px.bar(
-    data[data["Mês"] == "TOTAL"], x="Mês", y=["Valor Contrato", "Valor Pago"],
+    df_total, x="Mês", y="value", color="variable",
     title="Total do Contrato vs Total Pago",
     labels={"value": "Valor (R$)", "Mês": "Total"},
-    barmode="group",
-    text_auto=True,
-    color_discrete_map={"Valor Contrato": "blue", "Valor Pago": "green"}
+    text_auto=True
 )
 st.plotly_chart(fig2, use_container_width=True)
 
 # Gráfico 3: Economia Mensal + Economia Total
 fig3 = px.bar(
-    data, x="Mês", y="Economia",
+    df, x="Mês", y="Economia",
     title="Economia Mensal e Total",
     labels={"Economia": "Valor Economizado (R$)", "Mês": "Mês"},
     text_auto=True,
@@ -56,4 +57,4 @@ st.plotly_chart(fig3, use_container_width=True)
 
 # Exibir a tabela com os dados formatados
 st.subheader("📋 Tabela de Dados")
-st.dataframe(df, use_container_width=True)
+st.dataframe(df_display, use_container_width=True)
