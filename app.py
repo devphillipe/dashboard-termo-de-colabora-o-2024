@@ -27,22 +27,21 @@ df_display["Economia"] = df["Economia"].apply(format_currency)
 # Título principal
 st.title("📊 Dashboard - Economia no Termo de Colaboração 2024")
 
-# Gráfico 1: Comparação Valor Contrato vs Valor Pago por mês
-df_melted = df.melt(id_vars=["Mês"], value_vars=["Valor Contrato", "Valor Pago"], var_name="Tipo", value_name="Valor")
-
-fig1 = px.bar(
-    df_melted, x="Mês", y="Valor", color="Tipo",
+# Gráfico 1: Comparação Valor Contrato vs Valor Pago por mês (Gráfico de Linhas para melhor visualização)
+fig1 = px.line(
+    df, x="Mês", y=["Valor Contrato", "Valor Pago"],
     title="Comparação Mensal: Valor do Contrato vs Valor Pago",
-    labels={"Valor": "Valor (R$)", "Mês": "Mês"},
-    barmode="group",
-    text=df_melted["Valor"].apply(format_currency)  # Exibir os valores formatados
+    labels={"value": "Valor (R$)", "Mês": "Mês", "variable": "Tipo"},
+    markers=True
 )
 
-fig1.update_traces(textposition="outside", textfont_size=12)  # Valores acima das barras
+# Adicionar os valores nos pontos
+for trace in fig1.data:
+    trace.update(text=[format_currency(v) for v in trace.y], textposition="top center", textfont_size=14, mode="markers+text")
 
 st.plotly_chart(fig1, use_container_width=True)
 
-# Gráfico 2: Comparação Total do Contrato vs Total Pago
+# Gráfico 2: Comparação Total do Contrato vs Total Pago (Valores no Centro)
 df_total = df[df["Mês"] == "TOTAL"].melt(id_vars=["Mês"], value_vars=["Valor Contrato", "Valor Pago"], var_name="Tipo", value_name="Valor")
 
 fig2 = px.bar(
@@ -52,11 +51,11 @@ fig2 = px.bar(
     text=df_total["Valor"].apply(format_currency)  # Exibir os valores formatados
 )
 
-fig2.update_traces(textposition="outside", textfont_size=14)  # Valores acima das barras
+fig2.update_traces(textposition="inside", textfont_size=16)  # Valores no centro das barras
 
 st.plotly_chart(fig2, use_container_width=True)
 
-# Gráfico 3: Economia Mensal + Economia Total
+# Gráfico 3: Economia Mensal + Economia Total (Barras com valores visíveis)
 fig3 = px.bar(
     df, x="Mês", y="Economia",
     title="Economia Mensal e Total",
@@ -65,7 +64,7 @@ fig3 = px.bar(
     color="Economia"
 )
 
-fig3.update_traces(textposition="outside", textfont_size=12)  # Valores acima das barras
+fig3.update_traces(textposition="outside", textfont_size=14)  # Valores acima das barras, com fonte maior
 
 st.plotly_chart(fig3, use_container_width=True)
 
