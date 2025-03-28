@@ -22,7 +22,7 @@ df = pd.DataFrame(data)
 # Título principal
 st.title("📊 Dashboard - Economia no Termo de Colaboração 2024")
 
-# Gráfico 1: Comparação Valor Contrato vs Valor Pago por mês (AJUSTADO)
+# Gráfico 1: Comparação Valor Contrato vs Valor Pago por mês
 df_melted = df[df["Mês"] != "TOTAL"].melt(id_vars=["Mês"], value_vars=["Valor Contrato", "Valor Pago"], var_name="Tipo", value_name="Valor")
 
 fig1 = px.bar(
@@ -50,7 +50,7 @@ fig1.update_layout(
 
 st.plotly_chart(fig1, use_container_width=True)
 
-# Gráfico 2: Comparação Total do Contrato vs Total Pago (VALORES CENTRALIZADOS)
+# Gráfico 2: Comparação Total do Contrato vs Total Pago (valores centralizados)
 df_total = df[df["Mês"] == "TOTAL"].melt(value_vars=["Valor Contrato", "Valor Pago"], var_name="Tipo", value_name="Valor")
 
 fig2 = px.bar(
@@ -61,10 +61,10 @@ fig2 = px.bar(
 )
 
 fig2.update_traces(
-    textposition="inside",  # Valores dentro das barras
-    textfont=dict(size=24, color="white"),  # Fonte branca e maior
+    textposition="inside",
+    textfont=dict(size=24, color="white"),
     marker_line_width=1.5,
-    showlegend=False  # Remove a legenda
+    showlegend=False
 )
 
 fig2.update_layout(
