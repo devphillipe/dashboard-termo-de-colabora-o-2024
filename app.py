@@ -22,90 +22,121 @@ df = pd.DataFrame(data)
 # Título principal
 st.title("📊 Dashboard - Economia no Termo de Colaboração 2024")
 
-# Gráfico 1: Comparação Valor Contrato vs Valor Pago por mês
-df_melted = df[df["Mês"] != "TOTAL"].melt(id_vars=["Mês"], value_vars=["Valor Contrato", "Valor Pago"], var_name="Tipo", value_name="Valor")
+# Layout de colunas para os primeiros dois gráficos
+col1, col2 = st.columns(2)
 
-fig1 = px.bar(
-    df_melted, x="Mês", y="Valor", color="Tipo",
-    title="<b>Comparação Mensal: Valor do Contrato vs Valor Pago</b>",
-    labels={"Valor": "Valor (R$)", "Mês": "Mês"},
-    barmode="group",
-    text=df_melted["Valor"].apply(lambda x: f'R$ {x/1e6:.2f}M')
-)
-
-fig1.update_traces(
-    textposition="outside",
-    textfont_size=14,
-    marker_line_width=1.5
-)
-
-fig1.update_layout(
-    yaxis=dict(
-        range=[1900000, 2150000],
-        tickprefix="R$ ",
-        ticksuffix=" ",
-        tickformat=".2s",
-        title_font=dict(size=14)
+# Gráfico 1: Valores do Contrato com Total
+with col1:
+    fig1 = px.bar(
+        df, x="Mês", y="Valor Contrato",
+        title="<b>VALORES DO CONTRATO</b>",
+        labels={"Valor Contrato": "Valor (R$)", "Mês": "Mês"},
+        text=df["Valor Contrato"].apply(format_currency)
+    )
+    fig1.update_traces(
+        textposition="outside",
+        textfont_size=12,
+        marker_color='#1f77b4',
+        marker_line_width=1.5
+    )
+    fig1.update_layout(
+        title_x=0.5,
+        title_font=dict(size=20),
+        yaxis=dict(
+            showticklabels=False,
+            title_text=""
         )
+    )
+    st.plotly_chart(fig1, use_container_width=True)
+
+# Gráfico 2: Valores Pagos com Total
+with col2:
+    fig2 = px.bar(
+        df, x="Mês", y="Valor Pago",
+        title="<b>VALORES PAGOS</b>",
+        labels={"Valor Pago": "Valor (R$)", "Mês": "Mês"},
+        text=df["Valor Pago"].apply(format_currency)
+    )
+    fig2.update_traces(
+        textposition="outside",
+        textfont_size=12,
+        marker_color='#ff7f0e',
+        marker_line_width=1.5
+    )
+    fig2.update_layout(
+        title_x=0.5,
+        title_font=dict(size=20),
+        yaxis=dict(
+            showticklabels=False,
+            title_text=""
+        )
+    )
+    st.plotly_chart(fig2, use_container_width=True)
+
+# Gráfico 3: Comparação Total Contrato vs Pago
+fig3 = px.bar(
+    df[df["Mês"] == "TOTAL"].melt(value_vars=["Valor Contrato", "Valor Pago"]),
+    x="variable", y="value", 
+    title="<b>COMPARAÇÃO TOTAL: CONTRATO VS PAGO</b>",
+    labels={"value": "Valor (R$)", "variable": ""},
+    text=df[df["Mês"] == "TOTAL"].melt(value_vars=["Valor Contrato", "Valor Pago"])["value"].apply(format_currency)
 )
-st.plotly_chart(fig1, use_container_width=True)
-
-# Gráfico 2: Comparação Total do Contrato vs Total Pago (valores centralizados)
-df_total = df[df["Mês"] == "TOTAL"].melt(value_vars=["Valor Contrato", "Valor Pago"], var_name="Tipo", value_name="Valor")
-
-fig2 = px.bar(
-    df_total, x="Tipo", y="Valor", color="Tipo",
-    title="<b>Total do Contrato vs Total Pago</b>",
-    labels={"Valor": "Valor (R$)", "Tipo": ""},
-    text=df_total["Valor"].apply(lambda x: f'R$ {x/1e6:.2f}M')
-)
-
-fig2.update_traces(
+fig3.update_traces(
     textposition="inside",
     textfont=dict(size=24, color="white"),
     marker_line_width=1.5,
     showlegend=False
 )
-
-fig2.update_layout(
+fig3.update_layout(
+    title_x=0.5,
+    title_font=dict(size=20),
     xaxis=dict(title_text=""),
     yaxis=dict(showticklabels=False, showgrid=False, title_text="")
 )
-
-st.plotly_chart(fig2, use_container_width=True)
-
-# Gráfico 3: Economia Mensal + Economia Total
-fig3 = px.bar(
-    df, x="Mês", y="Economia",
-    title="<b>Economia Mensal e Total</b>",
-    labels={"Economia": "Valor Economizado (R$)", "Mês": "Mês"},
-    text=df["Economia"].apply(lambda x: f'R$ {x/1e3:.1f}K'),
-    color="Economia",
-    color_continuous_scale="Blues"
-)
-
-fig3.update_traces(
-    textposition="outside",
-    textfont_size=12,
-    marker_line_width=1.5
-)
-
 st.plotly_chart(fig3, use_container_width=True)
 
-# Tabela com dados formatados
-st.subheader("📋 Tabela de Dados")
-df_display = df.copy()
-for col in ["Valor Contrato", "Valor Pago", "Economia"]:
-    df_display[col] = df[col].apply(format_currency)
-    
+# Gráfico 4: Economia Mensal + Total
+fig4 = px.bar(
+    df, x="Mês", y="Economia",
+    title="<b>ECONOMIA MENSAL E TOTAL</b>",
+    labels={"Economia": "Valor Economizado (R$)", "Mês": "Mês"},
+    text=df["Economia"].apply(format_currency)
+)
+fig4.update_traces(
+    textposition="outside",
+    textfont_size=12,
+    marker_color='#2ca02c',
+    marker_line_width=1.5
+)
+fig4.update_layout(
+    title_x=0.5,
+    title_font=dict(size=20),
+    yaxis=dict(
+        showticklabels=False,
+        title_text=""
+    )
+)
+st.plotly_chart(fig4, use_container_width=True)
+
+# Tabela com formatação numérica correta
+st.subheader("📋 TABELA DE DADOS COMPLETA")
 st.dataframe(
-    df_display,
+    df,
     use_container_width=True,
     hide_index=True,
     column_config={
-        "Mês": "Mês",
-        "Valor Contrato": st.column_config.NumberColumn("Valor Contrato", format="R$ %.2f"),
-        "Valor Pago": st.column_config.NumberColumn("Valor Pago", format="R$ %.2f"),
-        "Economia": st.column_config.NumberColumn("Economia", format="R$ %.2f")
+        "Mês": st.column_config.TextColumn("Mês"),
+        "Valor Contrato": st.column_config.NumberColumn(
+            "Valor Contrato (R$)",
+            format="R$ %.2f"
+        ),
+        "Valor Pago": st.column_config.NumberColumn(
+            "Valor Pago (R$)",
+            format="R$ %.2f"
+        ),
+        "Economia": st.column_config.NumberColumn(
+            "Economia (R$)",
+            format="R$ %.2f"
+        )
     }
 )
