@@ -27,7 +27,7 @@ df_display["Economia"] = df["Economia"].apply(format_currency)
 # Título principal
 st.title("📊 Dashboard - Economia no Termo de Colaboração 2024")
 
-# Gráfico 1: Comparação Valor Contrato vs Valor Pago por mês (Gráfico de Linhas com ajuste de escala)
+# Gráfico 1: Comparação Valor Contrato vs Valor Pago por mês (Gráfico de Linhas para melhor visualização)
 fig1 = px.line(
     df, x="Mês", y=["Valor Contrato", "Valor Pago"],
     title="Comparação Mensal: Valor do Contrato vs Valor Pago",
