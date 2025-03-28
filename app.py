@@ -25,7 +25,7 @@ df_display["Valor Pago"] = df["Valor Pago"].apply(format_currency)
 df_display["Economia"] = df["Economia"].apply(format_currency)
 
 # Título principal
-st.title("📊 Dashboard - Economia no Termo de Colaboração 2024")
+st.title("📊 Dashboard - Repasses às Creches Parceiras: Comparativo Contratual e Real - 2024")
 
 # Gráfico 1: Valor do Contrato por Mês
 df_contrato = df.melt(id_vars=["Mês"], value_vars=["Valor Contrato"], var_name="Tipo", value_name="Valor")
