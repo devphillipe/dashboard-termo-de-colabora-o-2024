@@ -45,20 +45,26 @@ st.plotly_chart(fig1, use_container_width=True)
 # Gráfico 2: Valor Pago por Mês
 df_pago = df.melt(id_vars=["Mês"], value_vars=["Valor Pago"], var_name="Tipo", value_name="Valor")
 
+# Definindo as cores
+color_map_pago = "#3498db"  # Cor azul para o gráfico de valor pago
+
 fig2 = px.bar(
     df_pago, x="Mês", y="Valor", color="Tipo",
     title="Valor Pago por Mês",
     labels={"Valor": "Valor (R$)", "Mês": "Mês"},
-    text=df_pago["Valor"].apply(format_currency)  # Exibir os valores formatados
+    text=df_pago["Valor"].apply(format_currency),  # Exibir os valores formatados
 )
 
 fig2.update_traces(textposition="outside", textfont_size=12)  # Valores acima das barras
-fig2.update_layout(title_x=0.5)  # Centralizar título
+fig2.update_layout(title_x=0.5, colorway=[color_map_pago])  # Centralizar título e aplicar a cor personalizada
 
 st.plotly_chart(fig2, use_container_width=True)
 
 # Gráfico 3: Comparação Total do Contrato vs Total Pago (centralizado)
 df_total = df[df["Mês"] == "TOTAL"].melt(id_vars=["Mês"], value_vars=["Valor Contrato", "Valor Pago"], var_name="Tipo", value_name="Valor")
+
+# Cor para o gráfico de total pago
+color_map_pago_total = "#3498db"  # A mesma cor azul
 
 fig3 = px.bar(
     df_total, x="Tipo", y="Valor", color="Tipo",
@@ -69,7 +75,7 @@ fig3 = px.bar(
 
 # Ajustando os valores para aparecer no centro das barras
 fig3.update_traces(textposition="inside", textfont_size=14)  # Valores no centro das barras
-fig3.update_layout(title_x=0.5)  # Centralizar título
+fig3.update_layout(title_x=0.5, colorway=[color_map_pago_total, "#2ecc71"])  # Centralizar título e cor personalizada
 
 st.plotly_chart(fig3, use_container_width=True)
 
