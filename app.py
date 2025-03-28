@@ -27,7 +27,7 @@ df_display["Economia"] = df["Economia"].apply(format_currency)
 # Título principal
 st.title("📊 Dashboard - Economia no Termo de Colaboração 2024")
 
-# Gráfico 1: Comparação Valor Contrato vs Valor Pago por mês (Gráfico de Linhas para melhor visualização)
+# Gráfico 1: Comparação Valor Contrato vs Valor Pago por mês (Gráfico de Linhas com ajuste de escala)
 fig1 = px.line(
     df, x="Mês", y=["Valor Contrato", "Valor Pago"],
     title="Comparação Mensal: Valor do Contrato vs Valor Pago",
@@ -35,11 +35,15 @@ fig1 = px.line(
     markers=True
 )
 
+# Ajustando a escala para valores mensais
+fig1.update_layout(
+    yaxis_tickformat=",.0f",  # Exibindo os valores sem casas decimais
+    yaxis=dict(tickprefix="R$ ", range=[0, 3000000])  # Ajustando a escala para 3 milhões
+)
+
 # Adicionar os valores nos pontos
 for trace in fig1.data:
     trace.update(text=[format_currency(v) for v in trace.y], textposition="top center", textfont_size=14, mode="markers+text")
-
-st.plotly_chart(fig1, use_container_width=True)
 
 # Gráfico 2: Comparação Total do Contrato vs Total Pago (Valores no Centro)
 df_total = df[df["Mês"] == "TOTAL"].melt(id_vars=["Mês"], value_vars=["Valor Contrato", "Valor Pago"], var_name="Tipo", value_name="Valor")
