@@ -2,60 +2,58 @@ import streamlit as st
 import pandas as pd
 import plotly.express as px
 
-# ⚠️ set_page_config precisa ser o primeiro comando Streamlit
-st.set_page_config(page_title="Dashboard - Termo de Colaboração 2024", layout="wide")
-
-# Criar DataFrame com os dados fornecidos
-dados = {
-    "MÊS": [
-        "FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO",
-        "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO"
-    ],
-    "VALOR CONTRATO": [
-        2027087.81, 2050497.49, 2064930.37, 2055308.45, 2045686.53, 
-        2026442.69, 2064930.37, 2060119.41, 2045686.53, 2055308.45, 2016175.65
-    ],
-    "VALOR REAL PAGO": [
-        2019387.81, 2044747.49, 2059480.37, 2050758.45, 2041186.53, 
-        2021942.69, 2061130.37, 2056419.41, 2042036.53, 2051658.45, 2012375.65
-    ],
-    "DIF. CONTRATO x PAGO": [
-        7700.00, 5750.00, 5450.00, 4550.00, 4500.00, 4500.00, 3800.00,
-        3700.00, 3650.00, 3650.00, 3800.00
-    ]
+# Criando o DataFrame com os dados
+data = {
+    "Mês": ["FEVEREIRO", "MARÇO", "ABRIL", "MAIO", "JUNHO", "JULHO", "AGOSTO", "SETEMBRO", "OUTUBRO", "NOVEMBRO", "DEZEMBRO", "TOTAL"],
+    "Valor Contrato": [2027087.81, 2050497.49, 2064930.37, 2055308.45, 2045686.53, 2026442.69, 2064930.37, 2060119.41, 2045686.53, 2055308.45, 2016175.65, 22512173.79],
+    "Valor Pago": [2019387.81, 2044747.49, 2059480.37, 2050758.45, 2041186.53, 2021942.69, 2061130.37, 2056419.41, 2042036.53, 2051658.45, 2012375.65, 22461123.75],
+    "Economia": [7700, 5750, 5450, 4550, 4500, 4500, 3800, 3700, 3650, 3650, 3800, 51050.04]
 }
 
-df = pd.DataFrame(dados)
+df = pd.DataFrame(data)
 
-# Criando o gráfico de economia mensal
-fig = px.bar(
-    df,
-    x="MÊS",
-    y="DIF. CONTRATO x PAGO",
-    text="DIF. CONTRATO x PAGO",
-    title="Economia Mensal - Termo de Colaboração 2024",
-    labels={"DIF. CONTRATO x PAGO": "Diferença (R$)"},
-    color="DIF. CONTRATO x PAGO",
-    color_continuous_scale="greens"
+# Formatar valores em R$
+df["Valor Contrato"] = df["Valor Contrato"].apply(lambda x: f"R$ {x:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+df["Valor Pago"] = df["Valor Pago"].apply(lambda x: f"R$ {x:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+df["Economia"] = df["Economia"].apply(lambda x: f"R$ {x:,.2f}".replace(",", "X").replace(".", ",").replace("X", "."))
+
+# Configuração da página
+st.set_page_config(page_title="Dashboard de Economia", layout="wide")
+
+# Título principal
+st.title("📊 Dashboard - Economia no Termo de Colaboração 2024")
+
+# Gráfico 1: Comparação Valor Contrato vs Valor Pago por mês
+fig1 = px.bar(
+    data, x="Mês", y=["Valor Contrato", "Valor Pago"],
+    title="Comparação Mensal: Valor do Contrato vs Valor Pago",
+    labels={"value": "Valor (R$)", "Mês": "Mês"},
+    barmode="group",
+    text_auto=True
 )
+st.plotly_chart(fig1, use_container_width=True)
 
-# Ajustes no layout do gráfico
-fig.update_traces(
-    texttemplate="R$ %{y:,.2f}",
-    textposition="outside"
+# Gráfico 2: Comparação Total do Contrato vs Total Pago
+fig2 = px.bar(
+    data[data["Mês"] == "TOTAL"], x="Mês", y=["Valor Contrato", "Valor Pago"],
+    title="Total do Contrato vs Total Pago",
+    labels={"value": "Valor (R$)", "Mês": "Total"},
+    barmode="group",
+    text_auto=True,
+    color_discrete_map={"Valor Contrato": "blue", "Valor Pago": "green"}
 )
+st.plotly_chart(fig2, use_container_width=True)
 
-fig.update_layout(
-    xaxis_title="Mês",
-    yaxis_title="Diferença em R$",
-    margin=dict(l=50, r=50, t=50, b=80),
-    coloraxis_showscale=False
+# Gráfico 3: Economia Mensal + Economia Total
+fig3 = px.bar(
+    data, x="Mês", y="Economia",
+    title="Economia Mensal e Total",
+    labels={"Economia": "Valor Economizado (R$)", "Mês": "Mês"},
+    text_auto=True,
+    color="Economia"
 )
+st.plotly_chart(fig3, use_container_width=True)
 
-# Exibir no Streamlit
-st.title("📊 Termo de Colaboração 2024")
-st.plotly_chart(fig, use_container_width=True)
-
-# Mostrar a tabela com os dados
-st.subheader("📋 Dados da Economia Mensal")
-st.dataframe(df)
+# Exibir a tabela com os dados formatados
+st.subheader("📋 Tabela de Dados")
+st.dataframe(df, use_container_width=True)
